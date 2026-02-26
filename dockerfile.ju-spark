@@ -1,0 +1,29 @@
+# Dockerfile.jupyter-spark
+FROM apache/spark:3.4.1
+
+# Установим Python, Jupyter и зависимости
+USER root
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv && \
+    rm -rf /var/lib/apt/lists/*
+
+# Установим Jupyter и CatBoost
+RUN pip3 install --no-cache-dir jupyterlab pyspark==3.4.1 catboost findspark
+
+COPY hive-site.xml $SPARK_HOME/jars/
+
+# Создадим рабочую директорию
+WORKDIR /opt/workspace
+RUN mkdir -p /opt/workspace/notebooks
+VOLUME ["/opt/workspace/notebooks"]
+
+# Настроим переменные окружения
+ENV PYTHONPATH=/opt/spark/python:/opt/spark/python/lib/py4j-*.zip
+ENV PYSPARK_PYTHON=python3
+ENV SPARK_HOME=/opt/spark
+
+# Порт Jupyter
+EXPOSE 8888
+
+# Запуск Jupyter Lab
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]
