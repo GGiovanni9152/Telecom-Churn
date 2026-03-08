@@ -29,7 +29,6 @@
         <name>fs.defaultFS</name>
         <value>hdfs://namenode:9000</value>
     </property>
-    <!-- ДОБАВЬТЕ ЭТУ СТРОКУ -->
     <property>
         <name>hive.metastore.warehouse.dir</name>
         <value>hdfs://namenode:9000/user/hive/warehouse</value>

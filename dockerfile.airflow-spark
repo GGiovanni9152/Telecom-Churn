@@ -1,0 +1,18 @@
+FROM apache/airflow:2.7.2
+
+USER root
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk wget && \
+    rm -rf /var/lib/apt/lists/*
+    
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+RUN wget https://archive.apache.org/dist/spark/spark-3.4.1/spark-3.4.1-bin-hadoop3.tgz -O /tmp/spark.tgz && \
+    tar -xzf /tmp/spark.tgz -C /opt && \
+    mv /opt/spark-3.4.1-bin-hadoop3 /opt/spark && \
+    rm /tmp/spark.tgz
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+USER airflow
