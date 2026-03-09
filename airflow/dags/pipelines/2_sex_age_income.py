@@ -20,7 +20,6 @@ def build_customer_sex_age_income(spark, logical_date, logger):
     logger.info('Processing customer_age ...')
     model_age = (
         spark.table('ff_dm.scoring_customer_age')
-        .withColumn('msisdn', F.concat(F.lit('7'), F.col('msisdn')))
         .select('msisdn', F.col('model_age'))
     )
     logger.info('Processing customer_income ...')
@@ -44,6 +43,8 @@ if __name__ == "__main__":
         .master("spark://spark-master:7077") \
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
+        .config("spark.cores.max", "2")\
+        .config('spark.executor.memory', '2g')\
         .enableHiveSupport() \
         .getOrCreate()
     
