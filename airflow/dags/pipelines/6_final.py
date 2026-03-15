@@ -22,26 +22,25 @@ def build_final_mobile_features(spark, logical_date, logger):
     logger.info('Collecting all sources...')
     final_df = (
         spark.table("spfix_dm.mob_features_dm__1__base")
+        .limit(700_000)
         .fillna(-1)
         .join(
-            spark.table('spfix_dm.mob_features_dm__2_customer_sex_age_income'),
+            spark.table('spfix_dm.mob_features_dm__2__base'),
             ['msisdn'], 'left'
         )
         .fillna('unk')
         .join(
-            spark.table('spfix_dm.mob_features_dm__3_competitors_contacts'),
+            spark.table('spfix_dm.mob_features_dm__3__base'),
             ['msisdn'], 'left'
         )
         .fillna(0)
-        .repartition(700)
         .join(
-            spark.table('spfix_dm.mob_features_dm__4_movements'),
+            spark.table('spfix_dm.mob_features_dm__4__base'),
             ['msisdn'], 'left'
         )
         .fillna(0)
-        .repartition(700)
         .join(
-            spark.table('spfix_dm.mob_features_dm__5_host_interests')
+            spark.table('spfix_dm.mob_features_dm__5__base')
             .drop('app_n', 'regid'),
             ['msisdn'], 'left'
         )
@@ -65,10 +64,10 @@ if __name__ == "__main__":
     
     logical_date = datetime.now().date()
 try:
-    final_df = build_customer_sex_age_income(spark, logical_date, logger)
+    final_df, dt = build_final_mobile_features(spark, logical_date, logger)
     (
         final_df
-        .repartition(10)
+        .repartition(8)
         .write
         .mode("overwrite")
         .format("orc")

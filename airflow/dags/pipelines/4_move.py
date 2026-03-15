@@ -25,6 +25,7 @@ def mock_getZidCentroidUDF(col_name):
 
 def build_moves_in_home_work_locations(spark, logical_date, logger):
     from pyspark.sql import functions as F
+    from pyspark.sql import Window
 
     logger.info('Building DataFrame with retro data of home/work locations...')
     part_dt_0 = datetime(logical_date.year, logical_date.month, 22).date()
@@ -79,7 +80,11 @@ def build_moves_in_home_work_locations(spark, logical_date, logger):
             'home_diff_2_3', 'work_diff_2_3'
         )
 
-        .limit(2_000_000)
+        .limit(8_000_000)
+
+        .withColumn('_rn', F.row_number().over(Window.partitionBy('msisdn').orderBy(F.lit(1))))
+        .filter(F.col('_rn') == 1)
+        .drop('_rn')
     )
 
     return final_home_work_features
@@ -90,8 +95,8 @@ if __name__ == "__main__":
         .master("spark://spark-master:7077") \
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
-        .config("spark.cores.max", "4")\
-        .config('spark.executor.memory', '4g')\
+        .config("spark.cores.max", "7")\
+        .config('spark.executor.memory', '6g')\
         .enableHiveSupport() \
         .getOrCreate()
     

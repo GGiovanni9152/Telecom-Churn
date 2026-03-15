@@ -37,6 +37,11 @@ task_stage4 = DummyOperator(
     dag = dag
 )
 
+task_stage5 = DummyOperator(
+    task_id = 'datamart_builded',
+    dag = dag
+)
+
 task_1_gr_datamart = BashOperator(
     task_id='build_gr_datamart',
     bash_command="""
@@ -109,6 +114,20 @@ task_5_hosts = BashOperator(
     dag = dag
 )
 
+task_6_final = BashOperator(
+    task_id='build_final',
+    bash_command="""
+        spark-submit \
+            --master spark://spark-master:7077 \
+            --conf spark.sql.catalogImplementation=hive \
+            --conf spark.sql.warehouse.dir=hdfs://namenode:9000/user/hive/warehouse \
+            --conf spark.hadoop.hive.metastore.uris=thrift://hive-metastore:9083 \
+            --conf spark.hadoop.dfs.client.use.datanode.hostname=true \
+            /opt/airflow/dags/pipelines/6_final.py {{ ds }}
+    """,
+    dag = dag
+)
+
 
 # /opt/airflow/dags/pipelines/1_gr_mobile_datamart.py {{ ds }}
 task_stage1 >> task_1_gr_datamart >> task_stage2
@@ -118,3 +137,5 @@ task_stage2 >> task_3_competitors >> task_stage3
 task_stage2 >> task_4_move >> task_stage3
 
 task_stage3 >> task_5_hosts >> task_stage4
+
+task_stage4 >> task_6_final >> task_stage5
