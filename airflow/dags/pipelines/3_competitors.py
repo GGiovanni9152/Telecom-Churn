@@ -81,11 +81,11 @@ def build_competitors_contacts(spark, logical_date, logger):
 
 if __name__ == "__main__":
     spark = SparkSession.builder \
-        .appName("build_cpmpetitors") \
+        .appName("build_competitors") \
         .master("spark://spark-master:7077") \
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
-        .config("spark.cores.max", "4")\
+        .config("spark.cores.max", "3")\
         .config('spark.executor.memory', '2g')\
         .enableHiveSupport() \
         .getOrCreate()

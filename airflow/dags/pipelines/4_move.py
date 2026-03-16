@@ -95,7 +95,7 @@ if __name__ == "__main__":
         .master("spark://spark-master:7077") \
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
-        .config("spark.cores.max", "7")\
+        .config("spark.cores.max", "3")\
         .config('spark.executor.memory', '6g')\
         .enableHiveSupport() \
         .getOrCreate()

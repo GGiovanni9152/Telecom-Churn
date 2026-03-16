@@ -12,7 +12,6 @@ def build_final_mobile_features(spark, logical_date, logger):
 
     import pyspark.sql.functions as F
 
-    logical_date = datetime.strptime(logical_date, '%Y-%m-%d').date()
     business_month = str(datetime(logical_date.year, logical_date.month, 1).date())
 
     logger.info('Building final dataframe...')
@@ -58,7 +57,7 @@ if __name__ == "__main__":
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
         .config("spark.cores.max", "2")\
-        .config('spark.executor.memory', '2g')\
+        .config('spark.executor.memory', '7g')\
         .enableHiveSupport() \
         .getOrCreate()
     

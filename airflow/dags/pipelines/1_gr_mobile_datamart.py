@@ -43,7 +43,12 @@ def build_gr_mobile_datamart(spark, logical_date, logger):
         .limit(1_000_000)
     )
 
-    return daily_features
+    res_df = (
+        daily_features
+        .join(spark.table("gr_dm.cp_mobile_monthly_history").drop('sappn', 'sappn_str', 'm_reg_cd', 'table_business_month'), ['app_n', 'regid'], 'left')
+    )
+
+    return res_df
 
 if __name__ == "__main__":
     spark = SparkSession.builder \
@@ -51,7 +56,7 @@ if __name__ == "__main__":
         .master("spark://spark-master:7077") \
         .config("spark.sql.catalogImplementation", "hive") \
         .config("spark.sql.warehouse.dir", "hdfs://namenode:9000/user/hive/warehouse") \
-        .config("spark.cores.max", "15")\
+        .config("spark.cores.max", "3")\
         .config('spark.executor.memory', '7g')\
         .enableHiveSupport() \
         .getOrCreate()
