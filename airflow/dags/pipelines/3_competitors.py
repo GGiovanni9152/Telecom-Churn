@@ -16,7 +16,7 @@ def build_competitors_contacts(spark, logical_date, logger):
     logger.info('Processing sms part ...')
     sms_users = (
         spark.table("spfix_dm.join_to_cnum_sms")
-        .withColumn('called_party_number', F.lower(F.regexp_replace(F.col('phone_num'), '\.', '')))
+        .withColumn('called_party_number', F.lower(F.regexp_replace(F.col('competitor'), '\.', '')))
         .groupby(['msisdn', 'called_party_number'])
         .agg(
             F.sum(F.col('call_sms')).alias('cnt_sms')
